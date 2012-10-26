@@ -1,0 +1,51 @@
+Thu Fast, Thu Furious
+
+Story:
+	- Web team was kidnapped by 6 evil ….. somethings
+	- Thu needs to beat his way through the bosses to save them
+
+Thu:
+	- Has no HP bar, but a Ego bar instead
+	- Special Attack:
+		- W2C: Chad and Willson jump onto the screen, massive attack does tons of damage.
+
+Style:
+	- Platformer/Beat-em-up
+	- Similar style to river city ransom
+
+Level Select:
+	- Megaman Style (Select a boss, play through the level, get the power from the boss)
+
+Bosses:
+	- Courtney
+		- She’s the one who kidnapped Cody.
+		- Has a spiked club.
+	- Comic Sans
+		- Attacks with “COMIC SAAAAANS”
+	- Your/You’re/There/Their/They’re
+		- Sentence at bottom of screen: eg. “____ too funny!”
+		- Must attack the proper “you’re” or “your” to do damage
+		- Obtained power: “Hooked on Phonics”
+			- Essentially a grappling hook
+	- A wolf?
+		- Noooope. Chuck Testa.
+
+Power Ups (other than the boss power ups):
+	- Thu’s Tutu
+		- Enable higher jumping
+	- Booster Juice
+		- Increase Ego
+
+Bonus Stages:
+- DDR Dancing  Stage
+	- Play a mini game of DDR?
+
+
+
+Useful Links:
+
+Github Repository: https://github.com/MrHayato/ThuFastThuFurious
+How to Git & Github: http://help.github.com/
+Sound Effects: http://www.drpetter.se/project_sfxr.html
+Platformer Code Sample: http://create.msdn.com/en-US/education/catalog/sample/platformer
+
