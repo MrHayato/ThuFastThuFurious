@@ -15,3 +15,4 @@ server.get("/index", function (req, res) {
 });
 
 server.listen(Constants.SERVER_PORT);
+console.log("Running server at: " + Constants.SERVER_HOST + ":" + Constants.SERVER_PORT);
