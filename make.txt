@@ -1,0 +1,3 @@
+--module amd
+--out public/js/app.js
+src/app.ts
