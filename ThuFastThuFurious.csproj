@@ -357,7 +357,7 @@
     <Content Include="public\assets\sprites\grass.png" />
     <Content Include="public\js\app.js" />
     <Content Include="public\js\libs\jaws.js" />
-    <Content Include="server\app.js" />
+    <Content Include="app.js" />
     <Content Include="server\constants.js" />
     <Content Include="src\app.ts" />
     <Content Include="src\classes\Constants.ts" />
