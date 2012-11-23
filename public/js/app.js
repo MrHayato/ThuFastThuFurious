@@ -4,6 +4,7 @@ var Keys;
     Keys.RIGHT = "right";
     Keys.UP = "up";
     Keys.DOWN = "down";
+    Keys.SHIFT = "shift";
 })(Keys || (Keys = {}));
 
 var Constants;
@@ -11,6 +12,21 @@ var Constants;
     Constants.VIEWPORT_WIDTH = 900;
     Constants.VIEWPORT_HEIGHT = 500;
 })(Constants || (Constants = {}));
+
+var MathHelpers;
+(function (MathHelpers) {
+    function clamp(value, low, high) {
+        var ret = value;
+        if(ret > high) {
+            ret = high;
+        }
+        if(ret < low) {
+            ret = low;
+        }
+        return ret;
+    }
+    MathHelpers.clamp = clamp;
+})(MathHelpers || (MathHelpers = {}));
 
 var __extends = this.__extends || function (d, b) {
     function __() { this.constructor = d; }
@@ -23,13 +39,14 @@ var Thu = (function (_super) {
         var anim = new jaws.Animation({
             sprite_sheet: "/assets/sprites/chrono.png",
             frame_size: [
-                24, 
+                32, 
                 34
             ],
             frame_duration: 100
         });
         this.animIdle = anim.slice(7, 9);
         this.animMove = anim.slice(0, 6);
+        this.animRun = anim.slice(10, 13);
         this.godMode = false;
         this.vx = 0;
         this.vy = 0;
@@ -37,7 +54,7 @@ var Thu = (function (_super) {
     anchor: "center",
     scale: 2,
     x: 0,
-    y: 0
+    y: 400
 });
     }
     Thu.prototype.takeDamage = function (amount) {
@@ -58,13 +75,20 @@ var Thu = (function (_super) {
         if(jaws.pressed(Keys.DOWN)) {
             this.vy = 2;
         }
+        this.isRunning = jaws.pressed(Keys.SHIFT);
         if(this.vx === 0 && this.vy === 0) {
             this.setImage(this.animIdle.next());
         } else {
             this.flipped = this.vx > 0;
-            this.move(this.vx, this.vy);
-            this.setImage(this.animMove.next());
+            if(this.isRunning) {
+                this.move(this.vx * 2, this.vy * 2);
+                this.setImage(this.animRun.next());
+            } else {
+                this.move(this.vx, this.vy);
+                this.setImage(this.animMove.next());
+            }
         }
+        this.y = MathHelpers.clamp(this.y, 360, Constants.VIEWPORT_HEIGHT - this.rect().height);
     };
     return Thu;
 })(jaws.Sprite);
@@ -124,10 +148,10 @@ var TFTF;
         ExampleState.prototype.draw = function () {
             jaws.clear();
             if(jaws.pressed(Keys.LEFT)) {
-                this.background.camera_x += -20;
+                this.background.camera_x += -20 * (this.player.isRunning ? 2 : 1);
             }
             if(jaws.pressed(Keys.RIGHT)) {
-                this.background.camera_x += 20;
+                this.background.camera_x += 20 * (this.player.isRunning ? 2 : 1);
             }
             this.background.draw();
             this.viewport.draw(this.player);

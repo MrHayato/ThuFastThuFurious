@@ -171,6 +171,11 @@ declare module jaws
 
     export class Rect
     {
+        x: number;
+        y: number;
+        width: number;
+        height: number;
+
         constructor (x: number, y: number, width: number, height: number);
         collidePoint(x: number, y: number)
             : bool;

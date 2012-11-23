@@ -4,6 +4,7 @@
     export var RIGHT: string = "right";
     export var UP: string = "up";
     export var DOWN: string = "down";
+    export var SHIFT: string = "shift";
 }
 
 module Constants

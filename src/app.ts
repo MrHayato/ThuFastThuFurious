@@ -48,8 +48,8 @@ module TFTF
         draw()
         {
             jaws.clear();
-            if (jaws.pressed(Keys.LEFT)) this.background.camera_x += -20;
-            if (jaws.pressed(Keys.RIGHT)) this.background.camera_x += 20;
+            if (jaws.pressed(Keys.LEFT)) this.background.camera_x += -20 * (this.player.isRunning ? 2 : 1);
+            if (jaws.pressed(Keys.RIGHT)) this.background.camera_x += 20 * (this.player.isRunning ? 2 : 1);
             this.background.draw();
             this.viewport.draw(this.player);
         }

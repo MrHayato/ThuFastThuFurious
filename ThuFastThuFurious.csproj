@@ -361,6 +361,7 @@
     <Content Include="server\constants.js" />
     <Content Include="src\app.ts" />
     <Content Include="src\classes\Constants.ts" />
+    <Content Include="src\classes\MathHelpers.ts" />
     <Content Include="src\classes\Thu.ts" />
     <Content Include="src\definitions\jaws.d.ts" />
     <Content Include="src\definitions\underscore-typed-1.4.d.ts" />
