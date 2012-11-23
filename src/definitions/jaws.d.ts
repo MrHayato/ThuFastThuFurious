@@ -1,13 +1,15 @@
 //  jaws.d.ts
 //  (c) 2012 Willson Haw
 
-declare module jaws {
+declare module jaws
+{
 
     /***********\
     * Animation *
     \***********/
-    
-    export interface AnimationOptions {
+
+    export interface AnimationOptions
+    {
         bounce?: bool;
         frame_direction?: number;
         frame_duration?: number;
@@ -21,8 +23,9 @@ declare module jaws {
         scale_image?: bool;
         sprite_sheet?: any;
     }
-    
-    export class Animation {
+
+    export class Animation
+    {
         bounce: bool;
         frame_direction: number;
         frame_duration: number;
@@ -35,156 +38,166 @@ declare module jaws {
         orientation: string;
         scale_image: bool;
         sprite_sheet: any;
-        
-        constructor(options: AnimationOptions);
+
+        constructor (options: AnimationOptions);
         atFirstFrame()
-            :bool;
+            : bool;
         atLastFrame()
-            :bool;
+            : bool;
         currentFrame()
-            :any;
+            : any;
         next()
-            :any;
+            : any;
         slice(start: number, stop: number)
-            :Animation;
+            : Animation;
         toString()
-            :string;
+            : string;
         update()
-            :Animation;
+            : Animation;
     }
-    
+
     /********\
     * Assets *
     \********/
-    
-    export class Assets {
-        constructor();
+
+    export class Assets
+    {
+        constructor ();
         add(src: string)
-            :Assets;
+            : Assets;
         add(src: string[])
-            :Assets;
-        getOrLoad(src: string, onload: () => void, onerror: () => void)
-            :void;
+            : Assets;
+        getOrLoad(src: string, onload: () => void , onerror: () => void )
+            : void;
         getType(src: string)
-            :string;
+            : string;
         isLoaded(src: string)
-            :bool;
+            : bool;
         isLoading(src: string)
-            :bool;
-        load(src: string, onload: () => void, onerror: () => void)
-            :void;
+            : bool;
+        load(src: string, onload: () => void , onerror: () => void )
+            : void;
         loadAll(options: any)
-            :void;
+            : void;
     }
-    
+
     /**********\
     * GameLoop *
     \**********/
-    
-    export interface GameLoopOptions {
+
+    export interface GameLoopOptions
+    {
         fps?: number;
         tick_duration?: number;
         ticks?: number;
     }
-    
-    export class GameLoop {
+
+    export class GameLoop
+    {
         fps: number;
         tick_duration: number;
         ticks: number;
-        
-        constructor(game_object: any, options?: GameLoopOptions, game_state_setup_options?: any);
+
+        constructor (game_object: any, options?: GameLoopOptions, game_state_setup_options?: any);
         loop()
-            :void;
+            : void;
         pause()
-            :void;
+            : void;
         runtime()
-            :void;
+            : void;
         start()
-            :void;
+            : void;
         stop()
-            :void;
+            : void;
         unpause()
-            :void;
+            : void;
     }
-    
+
     /***********\
     * GameState *
     \***********/
-    
-    export interface GameState {
-        setup?(): void;
-        update?(): void;
-        draw?(): void;
+
+    export interface GameState
+    {
+        setup? (): void;
+        update? (): void;
+        draw? (): void;
     }
-    
+
     /*****\
     * gfx *
     \*****/
-    
-    export module gfx {
+
+    export module gfx
+    {
         export function retroScaleImage(image: any, factor: number)
-            :HTMLCanvasElement;
+            : HTMLCanvasElement;
     }
-    
+
     /**********\
     * Parallax *
     \**********/
-    
-    export interface ParallaxOptions {
+
+    export interface ParallaxOptions
+    {
         camera_x?: number;
         camera_y?: number;
-        repeat_x?: number;
-        repeat_y?: number;
+        repeat_x?: bool;
+        repeat_y?: bool;
         scale?: number;
     }
-    
-    export class Parallax {
+
+    export class Parallax
+    {
         camera_x: number;
         camera_y: number;
         repeat_x: number;
         repeat_y: number;
         scale: number;
-        
-        constructor(options: ParallaxOptions);
+        layers: ParallaxLayer[];
+
+        constructor (options: ParallaxOptions);
         addLayer(options: ParallaxLayerOptions)
-            :void;
-        draw(options)
-            :void;
+            : void;
+        draw(options?)
+            : void;
         toString()
-            :string;
+            : string;
     }
-    
+
     /******\
     * Rect *
     \******/
-    
-    export class Rect {
-        constructor(x: number, y: number, width: number, height: number);
+
+    export class Rect
+    {
+        constructor (x: number, y: number, width: number, height: number);
         collidePoint(x: number, y: number)
-            :bool;
+            : bool;
         collideRect(rect: Rect)
-            :bool;
+            : bool;
         draw()
-            :Rect;
+            : Rect;
         getPosition()
-            :number[];
+            : number[];
         move(x: number, y: number)
-            :Rect;
+            : Rect;
         moveTo(x: number, y: number)
-            :Rect;
+            : Rect;
         resize(width: number, height: number)
-            :Rect;
+            : Rect;
         resizeTo(width: number, height: number)
-            :Rect;
+            : Rect;
         toString()
-            :string;
+            : string;
     }
-    
+
     /********\
     * Sprite *
     \********/
-    
-    export interface SpriteOptions {
+
+    export interface SpriteOptions
+    {
         alpha?: number;
         anchor?: string;
         angle?: number;
@@ -195,240 +208,247 @@ declare module jaws {
         x?: number;
         y?: number;
     }
-    
-    export class Sprite {
+
+    export class Sprite
+    {
         alpha: number;
-        anchor: string;
         angle: number;
         flipped: bool;
         image: any;
         scale_image: number;
+        scale: number;
         x: number;
         y: number;
 
-        constructor(options: SpriteOptions);
+        constructor (options: SpriteOptions);
         asCanvas()
-            :HTMLCanvasElement;
+            : HTMLCanvasElement;
         asCanvasContext()
-            :CanvasRenderingContext2D;
+            : CanvasRenderingContext2D;
         attributes()
-            :SpriteOptions;
+            : SpriteOptions;
         clone()
-            :Sprite;
+            : Sprite;
         draw()
-            :Sprite;
+            : Sprite;
         flip()
-            :Sprite;
+            : Sprite;
         flipTo(value: number)
-            :Sprite;
+            : Sprite;
         move(x: number, y: number)
-            :Sprite;
+            : Sprite;
         moveTo(x: number, y: number)
-            :Sprite;
+            : Sprite;
         rect()
-            :Rect;
+            : Rect;
         resize(width: number, height: number)
-            :Sprite;
+            : Sprite;
         resizeTo(width: number, height: number)
-            :Sprite;
+            : Sprite;
         rotate(degrees: number)
-            :Sprite;
+            : Sprite;
         rotateTo(degrees: number)
-            :Sprite;
-        scale(value: number)
-            :Sprite;
+            : Sprite;
         scaleHeight(value: number)
-            :Sprite;
+            : Sprite;
         scaleImage(value: number)
-            :Sprite;
+            : Sprite;
         scaleTo(value: number)
-            :Sprite;
+            : Sprite;
         scaleWidth(value: number)
-            :Sprite;
+            : Sprite;
         setBottom(value: number)
-            :Sprite;
+            : Sprite;
         setHeight(value: number)
-            :Sprite;
+            : Sprite;
         setImage(value: any)
-            :Sprite;
+            : Sprite;
         setLeft(value: number)
-            :Sprite;
+            : Sprite;
         setRight(value: number)
-            :Sprite;
+            : Sprite;
         setTop(value: number)
-            :Sprite;
+            : Sprite;
         setWidth(value: number)
-            :Sprite;
+            : Sprite;
         setX(value: number)
-            :Sprite;
+            : Sprite;
         setY(value: number)
-            :Sprite;
+            : Sprite;
         toJSON()
-            :any;
+            : any;
         toString()
-            :string;
+            : string;
     }
-    
+
     /***************\
     * ParallaxLayer *
     \***************/
-    
-    export interface ParallaxLayerOptions extends SpriteOptions {
+
+    export interface ParallaxLayerOptions extends SpriteOptions
+    {
     }
-    
-    export class ParallaxLayer extends Sprite {
+
+    export class ParallaxLayer extends Sprite
+    {
         damping: number;
-        constructor(options: ParallaxLayerOptions);
+        constructor (options: ParallaxLayerOptions);
     }
-    
+
     /************\
     * SpriteList *
     \************/
-    
-    export class SpriteList {
-        constructor(options?: any);
+
+    export class SpriteList
+    {
+        constructor (options?: any);
         at(index: number)
-            :Sprite;
+            : Sprite;
         concat(...sprites: Sprite[])
-            :Sprite[];
+            : Sprite[];
         concat(...sprites: Sprite[][])
-            :Sprite[];
+            : Sprite[];
         deleteIf(condition: (sprite: Sprite) => bool)
-            :void;
+            : void;
         draw()
-            :void;
+            : void;
         drawIf(condition: (sprite: Sprite) => bool)
-            :void;
+            : void;
         every(callback: (element: Sprite, index?: number, array?: Sprite[]) => bool)
-            :bool;
+            : bool;
         filter(callback: (element: Sprite, index?: number, array?: Sprite[]) => bool)
-            :Sprite[];
-        forEach(callback: (element: Sprite, index?: number, array?: Sprite[]) => void)
-            :void;
+            : Sprite[];
+        forEach(callback: (element: Sprite, index?: number, array?: Sprite[]) => void )
+            : void;
         indexOf(element: Sprite, fromIndex?: number)
-            :number;
+            : number;
         isSpriteList()
-            :bool;
+            : bool;
         join(separator?: string)
-            :string;
+            : string;
         lastIndexOf(element: Sprite, fromIndex?: number)
-            :number;
+            : number;
         load(objects: Sprite[])
-            :void;
+            : void;
         load(objects: any[])
-            :void;
+            : void;
         load(objects: string)
-            :void;
+            : void;
         map(bacllback: (element: Sprite) => any)
-            :any[];
+            : any[];
         pop()
-            :Sprite;
+            : Sprite;
         push(...sprites: Sprite[])
-            :number;
+            : number;
         reduce(callback: (prevValue: Sprite, currValue: Sprite, index?: number, array?: Sprite[]) => any)
-            :any;
+            : any;
         reduceRight(callback: (prevValue: Sprite, currValue: Sprite, index?: number, array?: Sprite[]) => any)
-            :any;
+            : any;
         remove(obj: Sprite)
-            :void;
+            : void;
         removeIf(condition: (sprite: Sprite) => bool)
-            :void;
+            : void;
         reverse()
-            :void;
+            : void;
         shift()
-            :Sprite;
+            : Sprite;
         slice(start: number, end: number)
-            :Sprite[];
+            : Sprite[];
         some(callback: (element: Sprite, index?: number, array?: Sprite[]) => bool)
-            :bool;
+            : bool;
         sort(callback: (left: Sprite, right: Sprite) => number)
-            :Sprite[];
+            : Sprite[];
         splice(index: number, howMany?: number, ...sprites: Sprite[])
-            :Sprite[];
+            : Sprite[];
         unshift(...sprites: Sprite[])
-            :number;
+            : number;
         update()
-            :void;
+            : void;
         updateIf(condition: (sprite: Sprite) => bool)
-            :void;
+            : void;
         updateLength()
-            :void;
+            : void;
         valueOf()
-            :string;
+            : string;
     }
 
     /*************\
     * SpriteSheet *
     \*************/
-    
-    export interface SpriteSheetOptions {
+
+    export interface SpriteSheetOptions
+    {
         frame_size?: number[];
         offset?: number;
         image?: any;
         orientation?: string;
         scale_image: number;
     }
-    
-    export class SpriteSheet {
+
+    export class SpriteSheet
+    {
         frame_size: number[];
         offset: number;
         image: any;
         orientation: string;
         scale_image: number;
-        
-        constructor(options: SpriteSheetOptions);
+
+        constructor (options: SpriteSheetOptions);
         frames: HTMLCanvasElement[];
     }
-    
+
     /*********\
     * TileMap *
     \*********/
-    
-    export interface TileMapOptions {
+
+    export interface TileMapOptions
+    {
         cell_size?: number[];
         size?: number[];
         sortFunction?: (left: Sprite, right: Sprite) => number;
     }
-    
-    export class TileMap {
+
+    export class TileMap
+    {
         cell_size: number[];
         size: number[];
         sortFunction: (left: Sprite, right: Sprite) => number;
-        
-        constructor(options: TileMapOptions);
+
+        constructor (options: TileMapOptions);
         all()
-            :Sprite[];
+            : Sprite[];
         at(x: number, y: number)
-            :Sprite[];
+            : Sprite[];
         atRect(rect: Rect)
-            :Sprite[];
+            : Sprite[];
         cell(col: number, row: number)
-            :Sprite[];
+            : Sprite[];
         clear()
-            :void;
+            : void;
         push(obj: Sprite)
-            :any;
+            : any;
         push(objs: Sprite[])
-            :any;
+            : any;
         push(objs: SpriteList)
-            :any;
+            : any;
         pushAsPoint(obj: Sprite)
-            :any;
+            : any;
         pushAsRect(obj: Sprite, rect: Rect)
-            :any;
+            : any;
         pushToCell(col: number, row: number, obj: Sprite)
-            :any;
+            : any;
         sortCells(sortFunction: (left: Sprite, right: Sprite) => number)
-            :void;
+            : void;
         toString()
-            :string;
+            : string;
     }
-    
+
     /**********\
     * Viewport *
     \**********/
-    
-    export interface ViewportOptions {
+
+    export interface ViewportOptions
+    {
         height?: number;
         max_x?: number;
         max_y?: number;
@@ -436,8 +456,9 @@ declare module jaws {
         x?: number;
         y?: number;
     }
-    
-    export class Viewport {
+
+    export class Viewport
+    {
         height: number;
         max_x: number;
         max_y: number;
@@ -445,129 +466,133 @@ declare module jaws {
         x: number;
         y: number;
 
-        constructor(options: ViewportOptions);
-        apply(func: () => void)
-            :void;
+        constructor (options: ViewportOptions);
+        apply(func: () => void )
+            : void;
         centerAround(item: Sprite)
-            :void;
+            : void;
+        centerAround(item: { x: number; y: number; })
+            : void;
         draw(obj: Sprite)
-            :void;
+            : void;
         draw(objs: Sprite[])
-            :void;
+            : void;
+        draw(obj: { draw: () => void; })
+            : void;
         drawIfPartlyInside(item: Sprite)
-            :void;
+            : void;
         drawTileMap(tileMap: TileMap)
-            :void;
+            : void;
         forceInside(item: Sprite, buffer: number)
-            :void;
+            : void;
         forceInsideVisibleArea(item: Sprite, buffer: number)
-            :void;
+            : void;
         isAbove(item: Sprite)
-            :bool;
+            : bool;
         isBelow(item: Sprite)
-            :bool;
+            : bool;
         isInside(item: Sprite)
-            :bool;
+            : bool;
         isLeftOf(item: Sprite)
-            :bool;
+            : bool;
         isOutside(item: Sprite)
-            :bool;
+            : bool;
         isPartlyInside(item: Sprite)
-            :bool;
+            : bool;
         isRightOf(item: Sprite)
-            :bool;
+            : bool;
         move(x: number, y: number)
-            :void;
+            : void;
         moveTo(x: number, y: number)
-            :void;
+            : void;
     }
-    
+
     /*************\
     * Static Core *
     \*************/
-    
+
     //Fields
-    export var canvas                      
-        :HTMLCanvasElement;
-    export var context                     
-        :CanvasRenderingContext2D;
-    export var height                      
-        :number;
-    export var width                       
-        :number;
-    export var mouse_x                     
-        :number;
-    export var mouse_y                     
-        :number;
+    export var canvas
+        : HTMLCanvasElement;
+    export var context
+        : CanvasRenderingContext2D;
+    export var height
+        : number;
+    export var width
+        : number;
+    export var mouse_x
+        : number;
+    export var mouse_y
+        : number;
     export var game_loop
-        :GameLoop;
-    
+        : GameLoop;
+
     //Methods
-    
+
     export function clear()
-        :void;
+        : void;
     export function collideCircles(object1: Sprite, object2: Sprite)
-        :bool;
+        : bool;
     export function collideManyWithMany(list1: Sprite[], list2: Sprite[])
-        :bool;
+        : bool;
     export function collideOneWithMany(object: Sprite, list: Sprite[])
-        :bool;
+        : bool;
     export function collideOneWithOne(object1: Sprite, object2: Sprite)
-        :bool;
+        : bool;
     export function collideRects(rect1: Rect, rect2: Rect)
-        :bool;
+        : bool;
     export function distanceBetween(object1: Sprite, object2: Sprite)
-        :number;
+        : number;
     export function forceArray(object: any)
-        :any[];
+        : any[];
     export function forceArray(object: any[])
-        :any[];
+        : any[];
     export function forceInsideCanvas(item: Sprite)
-        :void;
+        : void;
     export function forceInsideCanvas(item: Rect)
-        :void;
+        : void;
     export function getUrlParameters()
-        :any;
+        : any;
     export function imageToCanvas(image: HTMLImageElement)
-        :HTMLCanvasElement;
+        : HTMLCanvasElement;
     export function isArray(object: any)
-        :bool;
+        : bool;
     export function isCanvas(object: any)
-        :bool;
+        : bool;
     export function isDrawable(object: any)
-        :bool;
+        : bool;
     export function isFunction(object: any)
-        :bool;
+        : bool;
     export function isImage(object: any)
-        :bool;
+        : bool;
     export function isOutsideCanvas(item: Sprite)
-        :bool;
+        : bool;
     export function isOutsideCanvas(item: Rect)
-        :bool;
+        : bool;
     export function isString(object: any)
-        :bool;
+        : bool;
     export function log(msg: string, append?: bool)
-        :void;
+        : void;
     export function on_keydown(key: string, callback: () => any)
-        :void;
+        : void;
     export function on_keydown(key: string[], callback: () => any)
-        :void;
+        : void;
     export function on_keyup(key: string, callback: () => any)
-        :void;
+        : void;
     export function on_keyup(key: string[], callback: () => any)
-        :void;
+        : void;
     export function onload()
-        :void;
+        : void;
     export function pressed(key: string)
-        :bool;
+        : bool;
     export function preventDefaultKeys(keys: string[])
-        :void;
+        : void;
     export function start(state: GameState, options?: any, game_state_setup_options?: any)
-        :void;
+        : void;
     export function switchGameState(state: GameState, options?: any, game_state_setup_options?: any)
-        :void;
+        : void;
     export function unpack()
-        :void;
-        
+        : void;
+
     declare var assets: Assets;
 }

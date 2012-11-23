@@ -351,6 +351,7 @@
     <Content Include="node_modules\typescript\LICENSE.txt" />
     <Content Include="node_modules\typescript\README.txt" />
     <Content Include="node_modules\typescript\ThirdPartyNoticeText.txt" />
+    <Content Include="public\assets\backgrounds\nightsky.png" />
     <Content Include="public\assets\sprites\block.bmp" />
     <Content Include="public\assets\sprites\droid_11x15.png" />
     <Content Include="public\assets\sprites\grass.png" />
@@ -359,6 +360,8 @@
     <Content Include="server\app.js" />
     <Content Include="server\constants.js" />
     <Content Include="src\app.ts" />
+    <Content Include="src\classes\Constants.ts" />
+    <Content Include="src\classes\Thu.ts" />
     <Content Include="src\definitions\jaws.d.ts" />
     <Content Include="src\definitions\underscore-typed-1.4.d.ts" />
   </ItemGroup>
@@ -499,8 +502,18 @@
     <Content Include="node_modules\typescript\package.json" />
     <Content Include="package.json" />
     <Content Include="README" />
+    <Content Include="src\interfaces\IEntity.ts" />
+    <Content Include="src\interfaces\IPlayerEntity.ts" />
     <Content Include="views\index.jade" />
   </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup />
   <Target Name="BeforeBuild">
     <Message Text="Compiling TypeScript files" />
     <Message Text="Executing tsc$(TypeScriptSourceMap) @(TypeScriptCompile ->'&quot;%(fullpath)&quot;', ' ')" />
