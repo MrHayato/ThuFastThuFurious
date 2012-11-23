@@ -14,9 +14,9 @@ class Thu extends jaws.Sprite implements IPlayerEntity
 
     constructor ()
     {
-        var anim = new jaws.Animation({ sprite_sheet: "/assets/sprites/droid_11x15.png", frame_size: [11, 15], frame_duration: 100 });
-        this.animIdle = anim.slice(0, 5);
-        this.animMove = anim.slice(6, 8);
+        var anim = new jaws.Animation({ sprite_sheet: "/assets/sprites/chrono.png", frame_size: [24, 34], frame_duration: 100 });
+        this.animIdle = anim.slice(7, 9);
+        this.animMove = anim.slice(0, 6);
         this.godMode = false;
         this.vx = 0;
         this.vy = 0;

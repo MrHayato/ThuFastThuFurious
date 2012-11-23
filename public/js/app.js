@@ -21,15 +21,15 @@ var Thu = (function (_super) {
     __extends(Thu, _super);
     function Thu() {
         var anim = new jaws.Animation({
-            sprite_sheet: "/assets/sprites/droid_11x15.png",
+            sprite_sheet: "/assets/sprites/chrono.png",
             frame_size: [
-                11, 
-                15
+                24, 
+                34
             ],
             frame_duration: 100
         });
-        this.animIdle = anim.slice(0, 5);
-        this.animMove = anim.slice(6, 8);
+        this.animIdle = anim.slice(7, 9);
+        this.animMove = anim.slice(0, 6);
         this.godMode = false;
         this.vx = 0;
         this.vy = 0;
@@ -93,9 +93,17 @@ var TFTF;
                 image: "/assets/backgrounds/nightsky.png",
                 damping: 50
             });
+            this.background.addLayer({
+                image: "/assets/backgrounds/bg_trees.png",
+                damping: 35
+            });
+            this.background.addLayer({
+                image: "/assets/backgrounds/foreground.png",
+                damping: 15
+            });
             this.viewport = new jaws.Viewport({
                 max_x: this.width * 32,
-                max_y: this.height * 32,
+                max_y: this.height,
                 width: this.width,
                 height: this.height
             });
@@ -128,10 +136,12 @@ var TFTF;
     })();    
     jaws.onload = function () {
         jaws.assets.add([
-            "/assets/sprites/droid_11x15.png", 
+            "/assets/sprites/chrono.png", 
             "/assets/sprites/block.bmp", 
             "/assets/sprites/grass.png", 
-            "/assets/backgrounds/nightsky.png"
+            "/assets/backgrounds/nightsky.png", 
+            "/assets/backgrounds/bg_trees.png", 
+            "/assets/backgrounds/foreground.png"
         ]);
         jaws.start(new ExampleState());
     };

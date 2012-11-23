@@ -27,8 +27,10 @@ module TFTF
             this.sky = new jaws.Animation({ sprite_sheet: "/assets/backgrounds/nightsky.png", frame_size: [1024, 512], frame_duration: 100 });
             this.background = new jaws.Parallax({ repeat_x: true, repeat_y: false });
             this.background.addLayer({ image: "/assets/backgrounds/nightsky.png", damping: 50 });
+            this.background.addLayer({ image: "/assets/backgrounds/bg_trees.png", damping: 35 });
+            this.background.addLayer({ image: "/assets/backgrounds/foreground.png", damping: 15 });
 
-            this.viewport = new jaws.Viewport({ max_x: this.width * 32, max_y: this.height * 32, width: this.width, height: this.height });
+            this.viewport = new jaws.Viewport({ max_x: this.width * 32, max_y: this.height, width: this.width, height: this.height });
 
             jaws.preventDefaultKeys(["up", "down", "left", "right", "space"]);
         }
@@ -57,9 +59,9 @@ module TFTF
     {
         //jaws.unpack()
         jaws.assets.add([
-            "/assets/sprites/droid_11x15.png", "/assets/sprites/block.bmp", "/assets/sprites/grass.png",
+            "/assets/sprites/chrono.png", "/assets/sprites/block.bmp", "/assets/sprites/grass.png",
             //backgrounds
-            "/assets/backgrounds/nightsky.png"
+            "/assets/backgrounds/nightsky.png", "/assets/backgrounds/bg_trees.png", "/assets/backgrounds/foreground.png"
             ]);
         
         jaws.start(new ExampleState());  // Our convenience function jaws.start() will load assets, call setup and loop update/draw in 60 FPS
