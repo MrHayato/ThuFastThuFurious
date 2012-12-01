@@ -1,0 +1,32 @@
+﻿{
+    "name": "Level 1",
+    "width": 3600,
+    "height": 500,
+    "background": {
+        "repeatX": true,
+        "repeatY": false,
+        "layers": [
+            {
+                "animation": {
+                    "sprite_sheet": "{assets:0}",
+                    "frame_size": [1024, 512],
+                    "frame_duration": 100
+                },
+                "damping": 50
+            },
+            { 
+                "image": "{assets:1}",
+                "damping": 35
+            },
+            { 
+                "image": "{assets:2}",
+                "damping": 15
+            }
+        ]
+    },
+    "assets": [
+        "/assets/backgrounds/nightsky.png",
+        "/assets/backgrounds/bg_trees.png",
+        "/assets/backgrounds/foreground.png"
+    ]
+}

@@ -67,7 +67,7 @@ declare module jaws
             : Assets;
         add(src: string[])
             : Assets;
-        getOrLoad(src: string, onload: () => void , onerror: () => void )
+        getOrLoad(src: string, onload?: () => void , onerror?: () => void )
             : void;
         getType(src: string)
             : string;
@@ -292,6 +292,7 @@ declare module jaws
 
     export interface ParallaxLayerOptions extends SpriteOptions
     {
+        damping: number;
     }
 
     export class ParallaxLayer extends Sprite

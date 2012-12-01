@@ -1,0 +1,18 @@
+﻿{
+    "name": "Thu",
+    "type": "player",
+    "health": 100,
+    "sprite": {
+        "sprite_sheet": "{assets:0}",
+        "frame_size": [64, 68],
+        "frame_duration": 100
+    },
+    "animations": {
+        "idle": [7, 9],
+        "move": [0, 6],
+        "run": [10, 13]
+    },
+    "assets": [
+        "/assets/sprites/chrono.png"
+    ]
+}

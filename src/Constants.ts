@@ -1,4 +1,6 @@
-﻿module Keys
+﻿///<reference path="definitions/jquery-1.8.d.ts" />
+
+module Keys
 {
     export var LEFT: string = "left";
     export var RIGHT: string = "right";

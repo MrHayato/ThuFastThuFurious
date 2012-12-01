@@ -5,6 +5,5 @@ interface IEntity
     vx: number;
     vy: number;
 
-    animIdle: jaws.Animation;
     update();
 }
