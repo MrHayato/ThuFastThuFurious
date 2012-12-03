@@ -2,20 +2,26 @@
 !!! 5
 html
     head
-        block Thu Fast, Thu Furious
-        //meta(name="viewport", content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no")
-        //meta(name="viewport", content="target-densitydpi=device-dpi")
-        //meta(name="apple-mobile-web-app-capable", content="yes")
-        //meta(name="apple-mobile-web-app-status-bar-style", content="black-translucent")
-        //meta(name="MobileOptimized", content="width")
-        //meta(name="HandheldFriendly", content="true")
+        title Thu Fast, Thu Furious
 
+        link(rel="stylesheet", type="text/css", href="http://twitter.github.com/bootstrap/assets/css/bootstrap.css")
         script(type="text/javascript", src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.8.3/jquery.min.js")
         script(type="text/javascript", src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.2/underscore-min.js")
         script(type="text/javascript", src="/js/libs/jaws.js")
         script(type="text/javascript", src="/js/app.js")
+        style
+            body {
+                margin: 50px;
+                text-align: center;
+            }
+
     body
-        div#fps
-        div#container
-            canvas(width="900", height="500")
-        
+        div.container
+            div.row
+                div#container.span12
+                    canvas(width="900", height="500")
+            div.row
+                div#instructions.span6.offset3
+                    span Move with arrow keys
+                div.span2.offset1 FPS:
+                    span#fps

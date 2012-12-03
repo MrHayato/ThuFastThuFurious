@@ -261,6 +261,7 @@ var TFTF;
             this.map.update();
         };
         ExampleState.prototype.draw = function () {
+            this.fps.innerHTML = jaws.game_loop.fps.toString();
             jaws.clear();
             this.map.draw();
         };

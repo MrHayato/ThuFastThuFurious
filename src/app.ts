@@ -20,7 +20,6 @@ module TFTF
             this.map = map;
         }
 
-        /* Called once when a game state is activated. Use it for one-time setup code. */
         setup()
         {
             this.width = Constants.VIEWPORT_WIDTH;
@@ -30,22 +29,16 @@ module TFTF
             jaws.preventDefaultKeys(["up", "down", "left", "right", "space"]);
         }
 
-        /* update() will get called each game tick with your specified FPS. Put game logic here. */
         update()
         {
-//            this.viewport.centerAround(this.player);
             this.map.update();
         }
 
-        /* Directly after each update draw() will be called. Put all your on-screen operations here. */
         draw()
         {
+            this.fps.innerHTML = jaws.game_loop.fps.toString();
             jaws.clear();
             this.map.draw();
-            //if (jaws.pressed(Keys.LEFT)) this.background.camera_x += -20 * (this.player.isRunning ? 2 : 1);
-            //if (jaws.pressed(Keys.RIGHT)) this.background.camera_x += 20 * (this.player.isRunning ? 2 : 1);
-            //this.background.draw();
-            //this.viewport.draw(this.player);
         }
     }
 
