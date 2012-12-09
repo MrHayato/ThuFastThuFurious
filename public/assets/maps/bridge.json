@@ -1,0 +1,18 @@
+﻿{
+    "name": "Bridge",
+    "width": 3600,
+    "height": 500,
+    "background": {
+        "repeatX": true,
+        "repeatY": false,
+        "layers": [
+            { 
+                "image": "{assets:0}",
+                "damping": 15
+            }
+        ]
+    },
+    "assets": [
+        "/assets/backgrounds/bridge.png"
+    ]
+}

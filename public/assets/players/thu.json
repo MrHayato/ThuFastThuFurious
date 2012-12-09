@@ -4,15 +4,50 @@
     "health": 100,
     "sprite": {
         "sprite_sheet": "{assets:0}",
-        "frame_size": [64, 68],
-        "frame_duration": 100
+        "frame_size": [48, 68],
+        "frame_duration": 150,
+        "orientation": "right"
     },
     "animations": {
-        "idle": [7, 9],
-        "move": [0, 6],
-        "run": [10, 13]
+        "idle": {
+            "frames": [0, 1]
+        },
+        "move": {
+            "frames": [0, 4]
+        },
+        "run": {
+            "frames": [10, 12],
+            "frame_duration": 75
+        },
+        "jump": {
+            "frames": [20, 21]
+        },
+        "crouch": {
+            "frames": [21, 22],
+            "frame_duration": 50
+        },
+        "block": {
+            "frames": [30, 31],
+            "frame_duration": 50,
+            "loop": false
+        },
+        "punch": {
+            "frames": [50, 53],
+            "frame_duration": 125,
+            "loop": false
+        },
+        "kick": {
+            "frames": [60, 63],
+            "frame_duration": 125,
+            "loop": false
+        },
+        "uppercut": {
+            "frames": [40, 43],
+            "frame_duration": 125,
+            "loop": false
+        }
     },
     "assets": [
-        "/assets/sprites/chrono.png"
+        "/assets/sprites/thu.png"
     ]
 }

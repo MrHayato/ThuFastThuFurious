@@ -5,6 +5,9 @@ var Keys;
     Keys.UP = "up";
     Keys.DOWN = "down";
     Keys.SHIFT = "shift";
+    Keys.Z = "z";
+    Keys.X = "x";
+    Keys.C = "c";
 })(Keys || (Keys = {}));
 
 var Constants;
@@ -34,11 +37,7 @@ var __extends = this.__extends || function (d, b) {
     d.prototype = new __();
 }
 var PlayerAnimations = (function () {
-    function PlayerAnimations(idle, move, run) {
-        this.idle = idle;
-        this.move = move;
-        this.run = run;
-    }
+    function PlayerAnimations() { }
     return PlayerAnimations;
 })();
 var Player = (function (_super) {
@@ -48,6 +47,7 @@ var Player = (function (_super) {
     anchor: "center"
 });
         this._loaded = false;
+        this._animLocked = false;
         var self = this;
         AssetLoader.preload(playerDef.assets, function () {
             self._loaded = true;
@@ -57,16 +57,40 @@ var Player = (function (_super) {
     Player.prototype.init = function (playerDef) {
         playerDef.sprite.sprite_sheet = AssetLoader.parseAsset(playerDef.sprite.sprite_sheet, playerDef.assets);
         var anim = new jaws.Animation(playerDef.sprite);
-        this.animations = new PlayerAnimations(anim.slice(playerDef.animations.idle[0], playerDef.animations.idle[1]), anim.slice(playerDef.animations.move[0], playerDef.animations.move[1]), anim.slice(playerDef.animations.run[0], playerDef.animations.run[1]));
+        this.animations = new PlayerAnimations();
+        for(var animationType in playerDef.animations) {
+            this.animations[animationType] = this.sliceAnimation(anim, playerDef.animations[animationType]);
+        }
         this.godMode = false;
         this.vx = 0;
         this.vy = 0;
     };
+    Player.prototype.sliceAnimation = function (animation, animDef) {
+        var slicedAnim = animation.slice(animDef.frames[0], animDef.frames[1]);
+        slicedAnim.frame_duration = animDef.frame_duration ? animDef.frame_duration : animation.frame_duration;
+        slicedAnim.loop = animDef.loop !== undefined ? animDef.loop : true;
+        return slicedAnim;
+    };
     Player.prototype.takeDamage = function (amount) {
         this.hp -= amount;
     };
+    Player.prototype.attack = function (animation, damage) {
+        var self = this;
+        this.vx = this.vy = 0;
+        this._animLocked = true;
+        this._lockedAnimation = animation;
+        this._lockedAnimation.index = 0;
+        this._lockedAnimation.on_end = function () {
+            self._animLocked = false;
+            self._lockedAnimation = null;
+        };
+    };
     Player.prototype.update = function () {
         if(!this._loaded) {
+            return;
+        }
+        if(this._animLocked) {
+            this.setImage(this._lockedAnimation.next());
             return;
         }
         this.vx = 0;
@@ -78,16 +102,30 @@ var Player = (function (_super) {
             this.vx = 2;
         }
         if(jaws.pressed(Keys.UP)) {
-            this.vy = -2;
+            this.vy = -1;
         }
         if(jaws.pressed(Keys.DOWN)) {
-            this.vy = 2;
+            this.vy = 1;
+        }
+        if(jaws.pressed(Keys.Z)) {
+            this.attack(this.animations.punch, 5);
+        }
+        if(jaws.pressed(Keys.X)) {
+            this.attack(this.animations.kick, 10);
+        }
+        if(jaws.pressed(Keys.C)) {
+            this.attack(this.animations.uppercut, 15);
         }
         this.isRunning = jaws.pressed(Keys.SHIFT);
         if(this.vx === 0 && this.vy === 0) {
             this.setImage(this.animations.idle.next());
         } else {
-            this.flipped = this.vx > 0;
+            if(this.vx < 0) {
+                this.flipped = true;
+            }
+            if(this.vx > 0) {
+                this.flipped = false;
+            }
             if(this.isRunning) {
                 this.move(this.vx * 2, this.vy * 2);
                 this.setImage(this.animations.run.next());
@@ -160,11 +198,9 @@ var Map = (function () {
         if(!this._loaded) {
             return;
         }
-        if(jaws.pressed(Keys.LEFT)) {
-            this._background.camera_x += -20;
-        }
-        if(jaws.pressed(Keys.RIGHT)) {
-            this._background.camera_x += 20;
+        var cameraSpeed = this._player.isRunning ? this._player.vx * 20 : this._player.vx * 10;
+        if(!isNaN(cameraSpeed) && cameraSpeed !== 0) {
+            this._background.camera_x += cameraSpeed;
         }
         this._background.draw();
         this._viewport.draw(this._player);
@@ -239,8 +275,8 @@ var AssetLoader;
     }
 })(AssetLoader || (AssetLoader = {}));
 
-var TFTF;
-(function (TFTF) {
+var States;
+(function (States) {
     var ExampleState = (function () {
         function ExampleState(map) {
             this.map = map;
@@ -261,17 +297,21 @@ var TFTF;
             this.map.update();
         };
         ExampleState.prototype.draw = function () {
-            this.fps.innerHTML = jaws.game_loop.fps.toString();
             jaws.clear();
+            this.fps.innerHTML = jaws.game_loop.fps.toString();
             this.map.draw();
         };
         return ExampleState;
-    })();    
+    })();
+    States.ExampleState = ExampleState;    
+})(States || (States = {}));
+
+var Game;
+(function (Game) {
     jaws.onload = function () {
-        var onLevelLoad = function (map) {
-            jaws.start(new ExampleState(map));
-        };
-        AssetLoader.load(AssetLoader.Types.Map, "level1", onLevelLoad);
+        AssetLoader.load(AssetLoader.Types.Map, "bridge", function (map) {
+            jaws.start(new States.ExampleState(map));
+        });
     };
-})(TFTF || (TFTF = {}));
+})(Game || (Game = {}));
 

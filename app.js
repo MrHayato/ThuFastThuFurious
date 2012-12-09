@@ -10,9 +10,5 @@ server.get("/", function (req, res) {
     res.render("./index.jade", { layout: false });
 });
 
-server.get("/index", function (req, res) {
-    res.render("./index.jade", { layout: false });
-});
-
 server.listen(Constants.SERVER_PORT);
 console.log("Running server at: " + Constants.SERVER_HOST + ":" + Constants.SERVER_PORT);

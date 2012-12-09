@@ -51,6 +51,9 @@
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
     <TypeScriptSourceMap> --sourcemap</TypeScriptSourceMap>
   </PropertyGroup>
+  <PropertyGroup>
+    <PostBuildEvent>tsc $(ProjectDir)@make.txt</PostBuildEvent>
+  </PropertyGroup>
   <ItemGroup>
     <Content Include=".gitignore" />
     <Content Include="docs\ideas.txt" />
@@ -352,12 +355,14 @@
     <Content Include="node_modules\typescript\README.txt" />
     <Content Include="node_modules\typescript\ThirdPartyNoticeText.txt" />
     <Content Include="public\assets\backgrounds\bg_trees.png" />
+    <Content Include="public\assets\backgrounds\bridge.png" />
     <Content Include="public\assets\backgrounds\foreground.png" />
     <Content Include="public\assets\backgrounds\nightsky.png" />
     <Content Include="public\assets\sprites\block.bmp" />
     <Content Include="public\assets\sprites\chrono.png" />
     <Content Include="public\assets\sprites\droid_11x15.png" />
     <Content Include="public\assets\sprites\grass.png" />
+    <Content Include="public\assets\sprites\thu.png" />
     <Content Include="public\js\app.js" />
     <Content Include="public\js\libs\jaws.js" />
     <Content Include="app.js" />
@@ -512,6 +517,7 @@
     <Content Include="README" />
     <Content Include="src\interfaces\IEntity.ts" />
     <Content Include="src\interfaces\IPlayerEntity.ts" />
+    <Content Include="src\states\ExampleState.ts" />
     <Content Include="src\states\menustate.ts" />
     <Content Include="views\index.jade" />
   </ItemGroup>
@@ -526,6 +532,7 @@
     <None Include="Procfile" />
     <Content Include="public\assets\maps\level1.json" />
     <Content Include="public\assets\players\thu.json" />
+    <Content Include="public\assets\maps\bridge.json" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="public\assets\entities\" />

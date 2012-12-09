@@ -5,6 +5,7 @@ interface IPlayerEntity extends IEntity
 {
     hp: number;
     isDead: bool;
+    isRunning: bool;
     godMode: bool;
     animations: PlayerAnimations;
     

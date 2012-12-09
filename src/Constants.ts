@@ -7,6 +7,9 @@ module Keys
     export var UP: string = "up";
     export var DOWN: string = "down";
     export var SHIFT: string = "shift";
+    export var Z: string = "z";
+    export var X: string = "x";
+    export var C: string = "c";
 }
 
 module Constants

@@ -117,8 +117,13 @@ class Map
     {
         if (!this._loaded) return;
 
-        if (jaws.pressed(Keys.LEFT)) this._background.camera_x += -20;
-        if (jaws.pressed(Keys.RIGHT)) this._background.camera_x += 20;
+        var cameraSpeed = this._player.isRunning
+            ? this._player.vx * 20
+            : this._player.vx * 10;
+
+        if (!isNaN(cameraSpeed) && cameraSpeed !== 0)
+            this._background.camera_x += cameraSpeed;
+
         this._background.draw();
         this._viewport.draw(this._player);
     }
