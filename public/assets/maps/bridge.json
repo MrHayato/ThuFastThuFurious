@@ -8,11 +8,16 @@
         "layers": [
             { 
                 "image": "{assets:0}",
+                "damping": 35
+            },
+            { 
+                "image": "{assets:1}",
                 "damping": 15
             }
         ]
     },
     "assets": [
-        "/assets/backgrounds/bridge.png"
+        "/assets/backgrounds/bridge.png",
+        "/assets/backgrounds/bridge_fg.png"
     ]
-}
+}   
