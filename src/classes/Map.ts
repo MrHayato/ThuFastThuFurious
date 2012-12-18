@@ -1,4 +1,5 @@
-﻿///<reference path="../definitions/jaws.d.ts" />
+﻿///<reference path="../definitions/underscore-typed-1.4.d.ts" />
+///<reference path="../definitions/jaws.d.ts" />
 ///<reference path="Player.ts" />
 ///<reference path="Entity.ts" />
 ///<reference path="AssetLoader.ts" />
@@ -176,17 +177,27 @@ class Map
         //Draw background
         this._background.draw();
 
-        //Draw entities
-        for (var i = 0; i < this._entities.length; i++)
+        var entities: jaws.Sprite[] = [];
+        _.each(this._entities, function (entity)
         {
-            this.drawIfInViewport(this._entities[i]);
-        }
+            entities.push(entity);
+        })
+        entities.push(this._player);
 
-        //Draw player
-        this._viewport.draw(this._player);
+        //Update order
+        entities = _.sortBy(entities, function (entity)
+        {
+            return entity.y + (entity.height / 2);
+        });
+
+        //Draw entities
+        for (var i = 0; i < entities.length; i++)
+        {
+            this.drawIfInViewport(entities[i]);
+        }
     }
 
-    drawIfInViewport(entity: Entity)
+    drawIfInViewport(entity: jaws.Sprite)
     {
         var rect = entity.rect();
         if (rect.x + rect.width > this._viewport.x && rect.x < this._viewport.x + this._viewport.width &&

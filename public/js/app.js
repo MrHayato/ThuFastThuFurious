@@ -316,10 +316,17 @@ var Map = (function () {
             return;
         }
         this._background.draw();
-        for(var i = 0; i < this._entities.length; i++) {
-            this.drawIfInViewport(this._entities[i]);
+        var entities = [];
+        _.each(this._entities, function (entity) {
+            entities.push(entity);
+        });
+        entities.push(this._player);
+        entities = _.sortBy(entities, function (entity) {
+            return entity.y + (entity.height / 2);
+        });
+        for(var i = 0; i < entities.length; i++) {
+            this.drawIfInViewport(entities[i]);
         }
-        this._viewport.draw(this._player);
     };
     Map.prototype.drawIfInViewport = function (entity) {
         var rect = entity.rect();
