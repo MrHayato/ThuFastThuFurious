@@ -16,6 +16,35 @@ var Constants;
     Constants.VIEWPORT_HEIGHT = 500;
 })(Constants || (Constants = {}));
 
+var __extends = this.__extends || function (d, b) {
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+}
+var Entity = (function (_super) {
+    __extends(Entity, _super);
+    function Entity(entityDef) {
+        _super.call(this, {
+    anchor: "center"
+});
+        this._loaded = false;
+        var self = this;
+        AssetLoader.preload(entityDef.assets, function () {
+            self._loaded = true;
+            self.init(entityDef);
+        });
+    }
+    Entity.prototype.init = function (entityDef) {
+        this.damage = entityDef.damage;
+        this.setImage(AssetLoader.parseAsset(entityDef.sprite, entityDef.assets));
+    };
+    Entity.prototype.update = function () {
+        if(!this._loaded) {
+            return;
+        }
+    };
+    return Entity;
+})(jaws.Sprite);
 var MathHelpers;
 (function (MathHelpers) {
     function clamp(value, low, high) {
@@ -31,11 +60,6 @@ var MathHelpers;
     MathHelpers.clamp = clamp;
 })(MathHelpers || (MathHelpers = {}));
 
-var __extends = this.__extends || function (d, b) {
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-}
 var PlayerAnimations = (function () {
     function PlayerAnimations() { }
     return PlayerAnimations;
@@ -138,89 +162,12 @@ var Player = (function (_super) {
     };
     return Player;
 })(jaws.Sprite);
-var Map = (function () {
-    function Map(mapDef) {
-        this._animatedBackgrounds = [];
-        this._loaded = false;
-        this.name = mapDef.name;
-        this.width = mapDef.width;
-        this.height = mapDef.height;
-        var self = this;
-        AssetLoader.preload(mapDef.assets, function () {
-            AssetLoader.load(AssetLoader.Types.Player, "thu", function (player) {
-                self._player = player;
-                self._loaded = true;
-                self.init(mapDef);
-            });
-        });
-    }
-    Map.prototype.init = function (mapDef) {
-        this._viewport = new jaws.Viewport({
-            max_x: this.width,
-            max_y: this.height,
-            width: Constants.VIEWPORT_WIDTH,
-            height: Constants.VIEWPORT_HEIGHT
-        });
-        this._background = new jaws.Parallax({
-            repeat_x: mapDef.background.repeatX,
-            repeat_y: mapDef.background.repeatY
-        });
-        for(var i = 0; i < mapDef.background.layers.length; i++) {
-            var layer = mapDef.background.layers[i];
-            var pxLayer = {
-                damping: layer.damping
-            };
-            pxLayer.image = layer.image ? AssetLoader.parseAsset(layer.image, mapDef.assets) : AssetLoader.parseAsset(layer.animation.sprite_sheet, mapDef.assets);
-            if(layer.animation) {
-                layer.animation.sprite_sheet = AssetLoader.parseAsset(layer.animation.sprite_sheet, mapDef.assets);
-                var animation = new jaws.Animation(layer.animation);
-                this._animatedBackgrounds.push({
-                    bgIndex: i,
-                    animation: animation
-                });
-            }
-            this._background.addLayer(pxLayer);
-        }
-    };
-    Map.prototype.update = function () {
-        if(!this._loaded) {
-            return;
-        }
-        for(var i = 0; i < this._animatedBackgrounds.length; i++) {
-            var anim = this._animatedBackgrounds[i];
-            var bgLayer = this._background.layers[anim.bgIndex];
-            bgLayer.setImage(anim.animation.next());
-        }
-        this._viewport.centerAround(this._player);
-        this._player.update();
-    };
-    Map.prototype.draw = function () {
-        if(!this._loaded) {
-            return;
-        }
-        var cameraSpeed = this._player.isRunning ? this._player.vx * 20 : this._player.vx * 10;
-        if(!isNaN(cameraSpeed) && cameraSpeed !== 0) {
-            this._background.camera_x += cameraSpeed;
-        }
-        this._background.draw();
-        this._viewport.draw(this._player);
-    };
-    return Map;
-})();
-var MapParser;
-(function (MapParser) {
-    function parse(assetString) {
-        var mapObj = JSON.parse(assetString);
-        return new Map(mapObj);
-    }
-    MapParser.parse = parse;
-})(MapParser || (MapParser = {}));
-
 var AssetLoader;
 (function (AssetLoader) {
     AssetLoader.Types = {
         "Map": "maps",
-        "Player": "players"
+        "Player": "players",
+        "Entity": "entities"
     };
     function preload(files, callback) {
         var numFilesLoaded = 0;
@@ -246,6 +193,11 @@ var AssetLoader;
                 }
                 case AssetLoader.Types.Player: {
                     asset = new Player(result);
+                    break;
+
+                }
+                case AssetLoader.Types.Entity: {
+                    asset = new Entity(result);
                     break;
 
                 }
@@ -275,6 +227,108 @@ var AssetLoader;
     }
 })(AssetLoader || (AssetLoader = {}));
 
+var Map = (function () {
+    function Map(mapDef) {
+        this._animatedBackgrounds = [];
+        this._loaded = false;
+        this.name = mapDef.name;
+        this.width = mapDef.width;
+        this.height = mapDef.height;
+        this._entities = [];
+        var self = this;
+        var numLoaded = 0;
+        var numToLoad = mapDef.entities.length + 1;
+        var onLoad = function () {
+            numLoaded++;
+            if(numLoaded === numToLoad) {
+                self._loaded = true;
+                self.init(mapDef);
+            }
+        };
+        for(var idx in mapDef.entities) {
+            (function () {
+                var entityDef = mapDef.entities[idx];
+                AssetLoader.load(AssetLoader.Types.Entity, entityDef.entity, function (entity) {
+                    entity.px = entityDef.x;
+                    entity.py = entityDef.y;
+                    self._entities.push(entity);
+                    onLoad();
+                });
+            })();
+        }
+        AssetLoader.preload(mapDef.assets, function () {
+            AssetLoader.load(AssetLoader.Types.Player, "thu", function (player) {
+                self._player = player;
+                onLoad();
+            });
+        });
+    }
+    Map.prototype.init = function (mapDef) {
+        this._viewport = new jaws.Viewport({
+            max_x: this.width,
+            max_y: this.height,
+            width: Constants.VIEWPORT_WIDTH,
+            height: Constants.VIEWPORT_HEIGHT
+        });
+        this._background = new jaws.Parallax({
+            repeat_x: mapDef.background.repeatX,
+            repeat_y: mapDef.background.repeatY
+        });
+        for(var i = 0; i < mapDef.background.layers.length; i++) {
+            var layer = mapDef.background.layers[i];
+            var pxLayer = {
+                damping: layer.damping
+            };
+            pxLayer.image = layer.image ? AssetLoader.parseAsset(layer.image, mapDef.assets) : AssetLoader.parseAsset(layer.animation.sprite_sheet, mapDef.assets);
+            if(layer.animation) {
+                layer.animation.sprite_sheet = AssetLoader.parseAsset(layer.animation.sprite_sheet, mapDef.assets);
+                var animation = new jaws.Animation(layer.animation);
+                this._animatedBackgrounds.push({
+                    bgIndex: i,
+                    animation: animation
+                });
+            }
+            this._background.addLayer(pxLayer);
+            if(layer.ground) {
+                this._groundLayer = this._background.layers[this._background.layers.length - 1];
+            }
+        }
+    };
+    Map.prototype.update = function () {
+        if(!this._loaded) {
+            return;
+        }
+        this._player.update();
+        this._viewport.centerAround(this._player);
+        this._background.camera_x = this._viewport.x * 10;
+        for(var i = 0; i < this._animatedBackgrounds.length; i++) {
+            var anim = this._animatedBackgrounds[i];
+            var bgLayer = this._background.layers[anim.bgIndex];
+            bgLayer.setImage(anim.animation.next());
+        }
+        for(var i = 0; i < this._entities.length; i++) {
+            this._entities[i].x = this._entities[i].px - (this._groundLayer.x * 0.5);
+            this._entities[i].y = this._entities[i].py;
+        }
+    };
+    Map.prototype.draw = function () {
+        if(!this._loaded) {
+            return;
+        }
+        this._background.draw();
+        for(var i = 0; i < this._entities.length; i++) {
+            this.drawIfInViewport(this._entities[i]);
+        }
+        this._viewport.draw(this._player);
+    };
+    Map.prototype.drawIfInViewport = function (entity) {
+        var rect = entity.rect();
+        if(rect.x + rect.width > this._viewport.x && rect.x < this._viewport.x + this._viewport.width && rect.y > 0 && rect.y < this._viewport.height) {
+            this._viewport.draw(entity);
+        }
+    };
+    return Map;
+})();
 var States;
 (function (States) {
     var ExampleState = (function () {

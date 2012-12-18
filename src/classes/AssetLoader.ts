@@ -1,12 +1,13 @@
 ﻿///<reference path="../definitions/jquery-1.8.d.ts" />
-///<reference path="parsers/MapParser.ts" />
+///<reference path="Entity.ts" />
 ///<reference path="Player.ts" />
 
 module AssetLoader
 {
     export var Types = {
         "Map": "maps",
-        "Player": "players"
+        "Player": "players",
+        "Entity": "entities"
     };
 
     export function preload(files: string[], callback: () => void)
@@ -40,6 +41,9 @@ module AssetLoader
                     break;
                 case Types.Player:
                     asset = new Player(result);
+                    break;
+                case Types.Entity:
+                    asset = new Entity(result);
                     break;
             }
 

@@ -1,0 +1,8 @@
+﻿{
+    "name": "crate",
+    "damage": 45,
+    "sprite": "{assets:0}",
+    "assets": [
+        "/assets/sprites/entities/crate.png"
+    ]
+}

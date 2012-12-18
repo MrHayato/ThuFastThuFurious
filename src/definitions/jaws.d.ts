@@ -224,6 +224,8 @@ declare module jaws
         scale: number;
         x: number;
         y: number;
+        px: number;
+        py: number;
 
         constructor (options: SpriteOptions);
         asCanvas()

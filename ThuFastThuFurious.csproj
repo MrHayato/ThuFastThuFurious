@@ -356,11 +356,13 @@
     <Content Include="node_modules\typescript\ThirdPartyNoticeText.txt" />
     <Content Include="public\assets\backgrounds\bg_trees.png" />
     <Content Include="public\assets\backgrounds\bridge.png" />
+    <Content Include="public\assets\backgrounds\bridge_fg.png" />
     <Content Include="public\assets\backgrounds\foreground.png" />
     <Content Include="public\assets\backgrounds\nightsky.png" />
     <Content Include="public\assets\sprites\block.bmp" />
     <Content Include="public\assets\sprites\chrono.png" />
     <Content Include="public\assets\sprites\droid_11x15.png" />
+    <Content Include="public\assets\sprites\entities\crate.png" />
     <Content Include="public\assets\sprites\grass.png" />
     <Content Include="public\assets\sprites\thu.png" />
     <Content Include="public\js\app.js" />
@@ -369,10 +371,10 @@
     <Content Include="server\constants.js" />
     <Content Include="src\app.ts" />
     <Content Include="src\classes\AssetLoader.ts" />
+    <Content Include="src\classes\Entity.ts" />
     <Content Include="src\Constants.ts" />
     <Content Include="src\classes\Map.ts" />
     <Content Include="src\classes\MathHelpers.ts" />
-    <Content Include="src\classes\parsers\MapParser.ts" />
     <Content Include="src\classes\Player.ts" />
     <Content Include="src\definitions\jaws.d.ts" />
     <Content Include="src\definitions\jquery-1.8.d.ts" />
@@ -533,9 +535,9 @@
     <Content Include="public\assets\maps\level1.json" />
     <Content Include="public\assets\players\thu.json" />
     <Content Include="public\assets\maps\bridge.json" />
+    <Content Include="public\assets\entities\crate.json" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="public\assets\entities\" />
     <Folder Include="public\assets\levels\" />
   </ItemGroup>
   <Target Name="BeforeBuild">

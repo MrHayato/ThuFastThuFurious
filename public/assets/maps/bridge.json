@@ -6,16 +6,29 @@
         "repeatX": true,
         "repeatY": false,
         "layers": [
-            { 
+            {
                 "image": "{assets:0}",
                 "damping": 35
             },
-            { 
+            {
                 "image": "{assets:1}",
-                "damping": 15
+                "damping": 15,
+                "ground": true
             }
         ]
     },
+    "entities": [
+        {
+            "entity": "crate",
+            "x": 400,
+            "y": 400
+        },
+        {
+            "entity": "crate",
+            "x": 700,
+            "y": 440
+        }
+    ],
     "assets": [
         "/assets/backgrounds/bridge.png",
         "/assets/backgrounds/bridge_fg.png"
