@@ -162,11 +162,19 @@ class Map
             bgLayer.setImage(anim.animation.next());
         }
 
-        //Update entity position
         for (var i = 0; i < this._entities.length; i++)
         {
+            //Update entity position
+            this._entities[i].update();
             this._entities[i].x = this._entities[i].px - (this._groundLayer.x * 0.5);
             this._entities[i].y = this._entities[i].py;
+
+            //Collision detection
+            var atkInfo = this._player.getAttackInfo();
+            if (atkInfo && atkInfo.hitbox.collideRect(this._entities[i].rect()))
+            {
+                this._entities[i].takeDamage(atkInfo);
+            }
         }
     }
 

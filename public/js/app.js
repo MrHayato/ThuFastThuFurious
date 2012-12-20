@@ -27,7 +27,9 @@ var Entity = (function (_super) {
         _super.call(this, {
     anchor: "center"
 });
+        this.decelRate = 0.85;
         this._loaded = false;
+        this._animLocked = false;
         var self = this;
         AssetLoader.preload(entityDef.assets, function () {
             self._loaded = true;
@@ -37,14 +39,51 @@ var Entity = (function (_super) {
     Entity.prototype.init = function (entityDef) {
         this.damage = entityDef.damage;
         this.setImage(AssetLoader.parseAsset(entityDef.sprite, entityDef.assets));
+        this.vx = 0;
+        this.vy = 0;
     };
     Entity.prototype.update = function () {
         if(!this._loaded) {
             return;
         }
+        this.px += this.vx;
+        this.vx *= this.decelRate;
+        if(this.vx < 0.05 && this.vx > 0) {
+            this.vx = 0;
+        }
+        if(this.vx > -0.05 && this.vx < 0) {
+            this.vx = 0;
+        }
+        if(this.vy < 0.05) {
+            this.vy = 0;
+        }
+        if(this.vx === 0 && this.vy === 0) {
+            this._animLocked = false;
+        }
+    };
+    Entity.prototype.takeDamage = function (attackInfo) {
+        if(attackInfo.handled) {
+            return;
+        }
+        this.vx = attackInfo.knockback[0];
+        attackInfo.handled = true;
+        this._animLocked = true;
     };
     return Entity;
 })(jaws.Sprite);
+var Utilities;
+(function (Utilities) {
+    function getSubRect(rect, box, flipped) {
+        if (typeof flipped === "undefined") { flipped = false; }
+        var boxX = flipped ? rect.width - (box[0] + box[2]) : box[0];
+        var newRect = new jaws.Rect(rect.x + boxX, rect.y + box[1], box[2], box[3]);
+        newRect.right = rect.right - rect.width + boxX + box[2];
+        newRect.bottom = rect.bottom - rect.height + box[1] + box[3];
+        return newRect;
+    }
+    Utilities.getSubRect = getSubRect;
+})(Utilities || (Utilities = {}));
+
 var MathHelpers;
 (function (MathHelpers) {
     function clamp(value, low, high) {
@@ -90,23 +129,26 @@ var Player = (function (_super) {
         this.vy = 0;
     };
     Player.prototype.sliceAnimation = function (animation, animDef) {
-        var slicedAnim = animation.slice(animDef.frames[0], animDef.frames[1]);
-        slicedAnim.frame_duration = animDef.frame_duration ? animDef.frame_duration : animation.frame_duration;
-        slicedAnim.loop = animDef.loop !== undefined ? animDef.loop : true;
-        return slicedAnim;
+        animDef.animation = animation.slice(animDef.frames[0], animDef.frames[1]);
+        animDef.animation.frame_duration = animDef.frame_duration ? animDef.frame_duration : animation.frame_duration;
+        animDef.animation.loop = animDef.loop !== undefined ? animDef.loop : true;
+        return animDef;
     };
-    Player.prototype.takeDamage = function (amount) {
-        this.hp -= amount;
+    Player.prototype.takeDamage = function (attackInfo) {
+        this.hp -= attackInfo.damage;
     };
     Player.prototype.attack = function (animation, damage) {
         var self = this;
         this.vx = this.vy = 0;
         this._animLocked = true;
+        this.isAttacking = true;
         this._lockedAnimation = animation;
-        this._lockedAnimation.index = 0;
-        this._lockedAnimation.on_end = function () {
+        this._lockedAnimation.animation.index = 0;
+        this._lockedAnimation.animation.on_end = function () {
             self._animLocked = false;
             self._lockedAnimation = null;
+            self._lastAttack = null;
+            self.isAttacking = false;
         };
     };
     Player.prototype.update = function () {
@@ -114,7 +156,7 @@ var Player = (function (_super) {
             return;
         }
         if(this._animLocked) {
-            this.setImage(this._lockedAnimation.next());
+            this.setImage(this._lockedAnimation.animation.next());
             return;
         }
         this.vx = 0;
@@ -142,7 +184,7 @@ var Player = (function (_super) {
         }
         this.isRunning = jaws.pressed(Keys.SHIFT);
         if(this.vx === 0 && this.vy === 0) {
-            this.setImage(this.animations.idle.next());
+            this.setImage(this.animations.idle.animation.next());
         } else {
             if(this.vx < 0) {
                 this.flipped = true;
@@ -152,13 +194,33 @@ var Player = (function (_super) {
             }
             if(this.isRunning) {
                 this.move(this.vx * 2, this.vy * 2);
-                this.setImage(this.animations.run.next());
+                this.setImage(this.animations.run.animation.next());
             } else {
                 this.move(this.vx, this.vy);
-                this.setImage(this.animations.move.next());
+                this.setImage(this.animations.move.animation.next());
             }
         }
         this.y = MathHelpers.clamp(this.y, 360, Constants.VIEWPORT_HEIGHT - this.rect().height);
+    };
+    Player.prototype.getAttackInfo = function () {
+        if(!this.isAttacking) {
+            return null;
+        }
+        if(this._lastAttack) {
+            return this._lastAttack;
+        }
+        var kb = this.flipped ? [
+            -this._lockedAnimation.attack.knockback[0], 
+            this._lockedAnimation.attack.knockback[1]
+        ] : this._lockedAnimation.attack.knockback;
+        var attackInfo = {
+            damage: this._lockedAnimation.attack.damage,
+            knockback: kb,
+            hitbox: Utilities.getSubRect(this.rect(), this._lockedAnimation.attack.box, this.flipped),
+            handled: false
+        };
+        this._lastAttack = attackInfo;
+        return attackInfo;
     };
     return Player;
 })(jaws.Sprite);
@@ -307,8 +369,13 @@ var Map = (function () {
             bgLayer.setImage(anim.animation.next());
         }
         for(var i = 0; i < this._entities.length; i++) {
+            this._entities[i].update();
             this._entities[i].x = this._entities[i].px - (this._groundLayer.x * 0.5);
             this._entities[i].y = this._entities[i].py;
+            var atkInfo = this._player.getAttackInfo();
+            if(atkInfo && atkInfo.hitbox.collideRect(this._entities[i].rect())) {
+                this._entities[i].takeDamage(atkInfo);
+            }
         }
     };
     Map.prototype.draw = function () {

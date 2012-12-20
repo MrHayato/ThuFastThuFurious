@@ -517,6 +517,8 @@
     <Content Include="node_modules\typescript\package.json" />
     <Content Include="package.json" />
     <Content Include="README" />
+    <Content Include="src\helpers\Utilities.ts" />
+    <Content Include="src\interfaces\IAttackInfo.ts" />
     <Content Include="src\interfaces\IEntity.ts" />
     <Content Include="src\interfaces\IPlayerEntity.ts" />
     <Content Include="src\states\ExampleState.ts" />

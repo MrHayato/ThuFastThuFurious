@@ -12,12 +12,14 @@ interface EntityDefinition
 
 class Entity extends jaws.Sprite implements IEntity
 {
+    decelRate = 0.85;
+
     damage: number;
     vx: number;
     vy: number;
-    vz: number;
 
     _loaded: bool = false;
+    _animLocked: bool = false;
 
     constructor (entityDef: EntityDefinition)
     {
@@ -35,10 +37,32 @@ class Entity extends jaws.Sprite implements IEntity
     {
         this.damage = entityDef.damage;
         this.setImage(AssetLoader.parseAsset(entityDef.sprite, entityDef.assets));
+        this.vx = 0;
+        this.vy = 0;
     }
 
     update()
     {
         if (!this._loaded) return;
+
+        this.px += this.vx;
+        this.vx *= this.decelRate;
+
+        if (this.vx < 0.05 && this.vx > 0) this.vx = 0;
+        if (this.vx > -0.05 && this.vx < 0) this.vx = 0;
+        if (this.vy < 0.05) this.vy = 0;
+
+        if (this.vx === 0 && this.vy === 0) this._animLocked = false;
+    }
+
+    takeDamage(attackInfo: IAttackInfo)
+    {
+        if (attackInfo.handled)
+            return;
+
+        this.vx = attackInfo.knockback[0];
+        attackInfo.handled = true;
+
+        this._animLocked = true;
     }
 }

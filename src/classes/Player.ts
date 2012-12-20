@@ -1,14 +1,25 @@
 ﻿///<reference path="../definitions/jaws.d.ts" />
 ///<reference path="../interfaces/IPlayerEntity.ts" />
+///<reference path="../interfaces/IAttackInfo.ts" />
 ///<reference path="../Constants.ts" />
 ///<reference path="../classes/AssetLoader.ts" />
+///<reference path="../helpers/Utilities.ts" />
 ///<reference path="MathHelpers.ts" />
+
+interface AttackDefinition
+{
+    box: number[];
+    knockback: number[];
+    damage: number;
+}
 
 interface PlayerAnimation
 {
     frames: number[];
     frame_duration?: number;
     loop?: bool;
+    attack?: AttackDefinition;
+    animation?: jaws.Animation;
 }
 
 interface PlayerAnimationDefinition
@@ -36,15 +47,15 @@ interface PlayerDefinition
 
 class PlayerAnimations
 {
-    public idle: jaws.Animation;
-    public move: jaws.Animation;
-    public run: jaws.Animation;
-    public jump: jaws.Animation;
-    public crouch: jaws.Animation;
-    public block: jaws.Animation;
-    public punch: jaws.Animation;
-    public kick: jaws.Animation;
-    public uppercut: jaws.Animation;
+    public idle: PlayerAnimation;
+    public move: PlayerAnimation;
+    public run: PlayerAnimation;
+    public jump: PlayerAnimation;
+    public crouch: PlayerAnimation;
+    public block: PlayerAnimation;
+    public punch: PlayerAnimation;
+    public kick: PlayerAnimation;
+    public uppercut: PlayerAnimation;
 }
 
 class Player extends jaws.Sprite implements IPlayerEntity
@@ -52,13 +63,15 @@ class Player extends jaws.Sprite implements IPlayerEntity
     hp: number;
     isDead: bool;
     isRunning: bool;
+    isAttacking: bool;
     godMode: bool;
     vx: number;
     vy: number;
 
     _loaded: bool = false;
     _animLocked: bool = false;
-    _lockedAnimation: jaws.Animation;
+    _lockedAnimation: PlayerAnimation;
+    _lastAttack: IAttackInfo;
     animations: PlayerAnimations;
 
     constructor (playerDef: PlayerDefinition)
@@ -89,36 +102,39 @@ class Player extends jaws.Sprite implements IPlayerEntity
         this.vy = 0;
     }
 
-    sliceAnimation(animation: jaws.Animation, animDef: PlayerAnimation): jaws.Animation
+    sliceAnimation(animation: jaws.Animation, animDef: PlayerAnimation): PlayerAnimation
     {
-        var slicedAnim = animation.slice(animDef.frames[0], animDef.frames[1]);
-        slicedAnim.frame_duration = animDef.frame_duration
+        animDef.animation = animation.slice(animDef.frames[0], animDef.frames[1]);
+        animDef.animation.frame_duration = animDef.frame_duration
             ? animDef.frame_duration
             : animation.frame_duration;
-        slicedAnim.loop = animDef.loop !== undefined
+        animDef.animation.loop = animDef.loop !== undefined
             ? animDef.loop
             : true;
 
-        return slicedAnim;
+        return animDef;
     }
 
-    takeDamage (amount: number) 
+    takeDamage(attackInfo: IAttackInfo)
     {
-        this.hp -= amount;
+        this.hp -= attackInfo.damage;
     }
 
-    attack(animation: jaws.Animation, damage: number)
+    attack(animation: PlayerAnimation, damage: number)
     {
         var self = this;
 
         this.vx = this.vy = 0;
         this._animLocked = true;
+        this.isAttacking = true;
         this._lockedAnimation = animation;
-        this._lockedAnimation.index = 0;
-        this._lockedAnimation.on_end = function ()
+        this._lockedAnimation.animation.index = 0;
+        this._lockedAnimation.animation.on_end = function ()
         {
             self._animLocked = false;
             self._lockedAnimation = null;
+            self._lastAttack = null;
+            self.isAttacking = false;
         }
     }
 
@@ -128,7 +144,7 @@ class Player extends jaws.Sprite implements IPlayerEntity
 
         if (this._animLocked)
         {
-            this.setImage(this._lockedAnimation.next());
+            this.setImage(this._lockedAnimation.animation.next());
             return;
         }
 
@@ -146,7 +162,7 @@ class Player extends jaws.Sprite implements IPlayerEntity
 
         if (this.vx === 0 && this.vy === 0)
         {
-            this.setImage(this.animations.idle.next());
+            this.setImage(this.animations.idle.animation.next());
         }
         else
         {
@@ -156,16 +172,46 @@ class Player extends jaws.Sprite implements IPlayerEntity
             if (this.isRunning)
             {
                 this.move(this.vx * 2, this.vy * 2);
-                this.setImage(this.animations.run.next());
+                this.setImage(this.animations.run.animation.next());
             }
             else
             {
                 this.move(this.vx, this.vy);
-                this.setImage(this.animations.move.next());
+                this.setImage(this.animations.move.animation.next());
             }
         }
 
         //This needs to moved out and put into map logic
         this.y = MathHelpers.clamp(this.y, 360, Constants.VIEWPORT_HEIGHT - this.rect().height);
     }
+
+    getAttackInfo(): IAttackInfo
+    {
+        if (!this.isAttacking)
+        {
+            return null;
+        }
+
+        if (this._lastAttack)
+        {
+            return this._lastAttack;
+        }
+
+        var kb = this.flipped
+            ? [-this._lockedAnimation.attack.knockback[0], this._lockedAnimation.attack.knockback[1]]
+            : this._lockedAnimation.attack.knockback;
+
+        var attackInfo: IAttackInfo = {
+            damage: this._lockedAnimation.attack.damage,
+            knockback: kb,
+            hitbox: Utilities.getSubRect(this.rect(), this._lockedAnimation.attack.box, this.flipped),
+            handled: false
+        };
+
+        this._lastAttack = attackInfo;
+
+        return attackInfo;
+    }
+
+    
 }

@@ -6,8 +6,9 @@ interface IPlayerEntity extends IEntity
     hp: number;
     isDead: bool;
     isRunning: bool;
+    isAttacking: bool;
     godMode: bool;
     animations: PlayerAnimations;
     
-    takeDamage(amount: number);
+    takeDamage(attackInfo: IAttackInfo);
 }

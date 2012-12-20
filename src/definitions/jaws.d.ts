@@ -175,6 +175,8 @@ declare module jaws
         y: number;
         width: number;
         height: number;
+        bottom: number;
+        right: number;
 
         constructor (x: number, y: number, width: number, height: number);
         collidePoint(x: number, y: number)
@@ -542,9 +544,9 @@ declare module jaws
     export function collideCircles(object1: Sprite, object2: Sprite)
         : bool;
     export function collideManyWithMany(list1: Sprite[], list2: Sprite[])
-        : bool;
+        : Sprite[][];
     export function collideOneWithMany(object: Sprite, list: Sprite[])
-        : bool;
+        : Sprite[];
     export function collideOneWithOne(object1: Sprite, object2: Sprite)
         : bool;
     export function collideRects(rect1: Rect, rect2: Rect)
