@@ -9,4 +9,5 @@ interface IEntity
 
     update();
     takeDamage(attackInfo: IAttackInfo);
+    getDepth();
 }

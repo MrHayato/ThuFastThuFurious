@@ -64,4 +64,9 @@ class Entity extends jaws.Sprite implements IEntity
 
         this._animLocked = true;
     }
+
+    getDepth()
+    {
+        return this.y;
+    }
 }

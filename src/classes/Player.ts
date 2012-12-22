@@ -233,7 +233,6 @@ class Player extends jaws.Sprite implements IPlayerEntity
             {
                 this.setImage(this.animations.move.animation.next());
             }
-
         }
 
         //This needs to moved out and put into map logic
@@ -267,5 +266,12 @@ class Player extends jaws.Sprite implements IPlayerEntity
         this._lastAttack = attackInfo;
 
         return attackInfo;
+    }
+
+    getDepth()
+    {
+        return this.isInAir
+            ? this._startingY
+            : this.y;
     }
 }

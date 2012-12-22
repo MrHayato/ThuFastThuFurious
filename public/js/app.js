@@ -77,6 +77,9 @@ var Entity = (function (_super) {
         attackInfo.handled = true;
         this._animLocked = true;
     };
+    Entity.prototype.getDepth = function () {
+        return this.y;
+    };
     return Entity;
 })(jaws.Sprite);
 var Utilities;
@@ -277,6 +280,9 @@ var Player = (function (_super) {
         this._lastAttack = attackInfo;
         return attackInfo;
     };
+    Player.prototype.getDepth = function () {
+        return this.isInAir ? this._startingY : this.y;
+    };
     return Player;
 })(jaws.Sprite);
 var AssetLoader;
@@ -445,7 +451,7 @@ var Map = (function () {
         });
         entities.push(this._player);
         entities = _.sortBy(entities, function (entity) {
-            return entity.y + (entity.height / 2);
+            return entity.getDepth() + (entity.height / 2);
         });
         for(var i = 0; i < entities.length; i++) {
             this.drawIfInViewport(entities[i]);

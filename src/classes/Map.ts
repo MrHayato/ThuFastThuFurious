@@ -196,7 +196,7 @@ class Map
         //Update order
         entities = _.sortBy(entities, function (entity)
         {
-            return entity.y + (entity.height / 2);
+            return entity.getDepth() + (entity.height / 2);
         });
 
         //Draw entities
