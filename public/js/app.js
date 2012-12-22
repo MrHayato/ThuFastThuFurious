@@ -8,12 +8,21 @@ var Keys;
     Keys.Z = "z";
     Keys.X = "x";
     Keys.C = "c";
+    Keys.S = "s";
 })(Keys || (Keys = {}));
 
 var Constants;
 (function (Constants) {
     Constants.VIEWPORT_WIDTH = 900;
     Constants.VIEWPORT_HEIGHT = 500;
+    Constants.FRICTION = 0.85;
+    Constants.GRAVITY = 0.7;
+    Constants.PLAYER_JUMP_HEIGHT = 10;
+    Constants.PLAYER_WALK_SPEED_X = 2;
+    Constants.PLAYER_WALK_SPEED_Y = 1.25;
+    Constants.PLAYER_RUN_MULTIPLIER = 2.25;
+    Constants.PLAYER_RUNNING_JUMP_MULTIPLIER = 1.25;
+    Constants.PLAYER_LANDING_DELAY = 125;
 })(Constants || (Constants = {}));
 
 var __extends = this.__extends || function (d, b) {
@@ -27,7 +36,6 @@ var Entity = (function (_super) {
         _super.call(this, {
     anchor: "center"
 });
-        this.decelRate = 0.85;
         this._loaded = false;
         this._animLocked = false;
         var self = this;
@@ -47,7 +55,7 @@ var Entity = (function (_super) {
             return;
         }
         this.px += this.vx;
-        this.vx *= this.decelRate;
+        this.vx *= Constants.FRICTION;
         if(this.vx < 0.05 && this.vx > 0) {
             this.vx = 0;
         }
@@ -137,19 +145,46 @@ var Player = (function (_super) {
     Player.prototype.takeDamage = function (attackInfo) {
         this.hp -= attackInfo.damage;
     };
-    Player.prototype.attack = function (animation, damage) {
+    Player.prototype.attack = function (animation) {
         var self = this;
-        this.vx = this.vy = 0;
-        this._animLocked = true;
+        this.vx = 0;
+        if(!this.isInAir) {
+            this.vy = 0;
+        }
         this.isAttacking = true;
-        this._lockedAnimation = animation;
-        this._lockedAnimation.animation.index = 0;
-        this._lockedAnimation.animation.on_end = function () {
-            self._animLocked = false;
-            self._lockedAnimation = null;
+        this.lock(animation, function () {
             self._lastAttack = null;
             self.isAttacking = false;
+        });
+    };
+    Player.prototype.jump = function () {
+        this.vy = -Constants.PLAYER_JUMP_HEIGHT;
+        if(this.isRunning) {
+            this.vx *= Constants.PLAYER_RUN_MULTIPLIER;
+            this.vy *= Constants.PLAYER_RUNNING_JUMP_MULTIPLIER;
+        }
+        this._startingY = this.y;
+        this.isInAir = true;
+    };
+    Player.prototype.lock = function (animation, unlockCallback, lockDuration) {
+        if (typeof unlockCallback === "undefined") { unlockCallback = null; }
+        if (typeof lockDuration === "undefined") { lockDuration = 0; }
+        var self = this;
+        var onUnlock = function () {
+            self._animLocked = false;
+            self._lockedAnimation = null;
+            if(unlockCallback) {
+                unlockCallback();
+            }
         };
+        this._animLocked = true;
+        this._lockedAnimation = animation;
+        this._lockedAnimation.animation.index = 0;
+        if(lockDuration === 0) {
+            this._lockedAnimation.animation.on_end = onUnlock;
+        } else {
+            setTimeout(onUnlock, lockDuration);
+        }
     };
     Player.prototype.update = function () {
         if(!this._loaded) {
@@ -159,31 +194,36 @@ var Player = (function (_super) {
             this.setImage(this._lockedAnimation.animation.next());
             return;
         }
-        this.vx = 0;
-        this.vy = 0;
-        if(jaws.pressed(Keys.LEFT)) {
-            this.vx = -2;
+        if(!this.isInAir) {
+            this.vx = 0;
+            this.vy = 0;
+            this.isRunning = jaws.pressed(Keys.SHIFT);
+            if(jaws.pressed(Keys.LEFT)) {
+                this.vx = -Constants.PLAYER_WALK_SPEED_X;
+            }
+            if(jaws.pressed(Keys.RIGHT)) {
+                this.vx = Constants.PLAYER_WALK_SPEED_X;
+            }
+            if(jaws.pressed(Keys.UP)) {
+                this.vy = -Constants.PLAYER_WALK_SPEED_Y;
+            }
+            if(jaws.pressed(Keys.DOWN)) {
+                this.vy = Constants.PLAYER_WALK_SPEED_Y;
+            }
+            if(jaws.pressed(Keys.Z)) {
+                this.attack(this.animations.punch);
+            }
+            if(jaws.pressed(Keys.X)) {
+                this.attack(this.animations.kick);
+            }
+            if(jaws.pressed(Keys.C)) {
+                this.attack(this.animations.uppercut);
+            }
+            if(jaws.pressed(Keys.S)) {
+                this.jump();
+            }
         }
-        if(jaws.pressed(Keys.RIGHT)) {
-            this.vx = 2;
-        }
-        if(jaws.pressed(Keys.UP)) {
-            this.vy = -1;
-        }
-        if(jaws.pressed(Keys.DOWN)) {
-            this.vy = 1;
-        }
-        if(jaws.pressed(Keys.Z)) {
-            this.attack(this.animations.punch, 5);
-        }
-        if(jaws.pressed(Keys.X)) {
-            this.attack(this.animations.kick, 10);
-        }
-        if(jaws.pressed(Keys.C)) {
-            this.attack(this.animations.uppercut, 15);
-        }
-        this.isRunning = jaws.pressed(Keys.SHIFT);
-        if(this.vx === 0 && this.vy === 0) {
+        if(this.vx === 0 && this.vy === 0 && !this.isInAir) {
             this.setImage(this.animations.idle.animation.next());
         } else {
             if(this.vx < 0) {
@@ -192,15 +232,30 @@ var Player = (function (_super) {
             if(this.vx > 0) {
                 this.flipped = false;
             }
-            if(this.isRunning) {
-                this.move(this.vx * 2, this.vy * 2);
-                this.setImage(this.animations.run.animation.next());
+            if(this.isInAir) {
+                if(this.y + this.vy >= this._startingY) {
+                    this.y = this._startingY;
+                    this.vx = 0;
+                    this.vy = 0;
+                    this.isInAir = false;
+                    this.lock(this.animations.crouch, null, Constants.PLAYER_LANDING_DELAY);
+                } else {
+                    this.vy = this.vy + Constants.GRAVITY;
+                    this.setImage(this.animations.jump.animation.next());
+                }
             } else {
-                this.move(this.vx, this.vy);
-                this.setImage(this.animations.move.animation.next());
+                if(this.isRunning) {
+                    this.vx *= Constants.PLAYER_RUN_MULTIPLIER;
+                    this.vy *= Constants.PLAYER_RUN_MULTIPLIER;
+                    this.setImage(this.animations.run.animation.next());
+                } else {
+                    this.setImage(this.animations.move.animation.next());
+                }
             }
         }
-        this.y = MathHelpers.clamp(this.y, 360, Constants.VIEWPORT_HEIGHT - this.rect().height);
+        if(!this.isInAir) {
+            this.y = MathHelpers.clamp(this.y, 360, Constants.VIEWPORT_HEIGHT - this.rect().height);
+        }
     };
     Player.prototype.getAttackInfo = function () {
         if(!this.isAttacking) {
@@ -361,6 +416,7 @@ var Map = (function () {
             return;
         }
         this._player.update();
+        this._player.move(this._player.vx, this._player.vy);
         this._viewport.centerAround(this._player);
         this._background.camera_x = this._viewport.x * 10;
         for(var i = 0; i < this._animatedBackgrounds.length; i++) {

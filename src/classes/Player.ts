@@ -61,9 +61,10 @@ class PlayerAnimations
 class Player extends jaws.Sprite implements IPlayerEntity
 {
     hp: number;
-    isDead: bool;
+    isDead: bool;//Todo: Move to player state
     isRunning: bool;
     isAttacking: bool;
+    isInAir: bool;
     godMode: bool;
     vx: number;
     vy: number;
@@ -72,6 +73,7 @@ class Player extends jaws.Sprite implements IPlayerEntity
     _animLocked: bool = false;
     _lockedAnimation: PlayerAnimation;
     _lastAttack: IAttackInfo;
+    _startingY: number;
     animations: PlayerAnimations;
 
     constructor (playerDef: PlayerDefinition)
@@ -120,22 +122,55 @@ class Player extends jaws.Sprite implements IPlayerEntity
         this.hp -= attackInfo.damage;
     }
 
-    attack(animation: PlayerAnimation, damage: number)
+    attack(animation: PlayerAnimation)
     {
         var self = this;
 
-        this.vx = this.vy = 0;
-        this._animLocked = true;
+        this.vx = 0; 
+        
+        if (!this.isInAir)
+            this.vy = 0;
+
         this.isAttacking = true;
-        this._lockedAnimation = animation;
-        this._lockedAnimation.animation.index = 0;
-        this._lockedAnimation.animation.on_end = function ()
+        this.lock(animation, function ()
+        {
+            self._lastAttack = null;
+            self.isAttacking = false;
+        });
+    }
+
+    jump()
+    {
+        this.vy = -Constants.PLAYER_JUMP_HEIGHT;
+        if (this.isRunning)
+        {
+            this.vx *= Constants.PLAYER_RUN_MULTIPLIER;
+            this.vy *= Constants.PLAYER_RUNNING_JUMP_MULTIPLIER;
+        }
+        this._startingY = this.y;
+        this.isInAir = true;
+    }
+
+    lock(animation: PlayerAnimation, unlockCallback?: () => void = null, lockDuration?: number = 0)
+    {
+        var self = this;
+        var onUnlock = function ()
         {
             self._animLocked = false;
             self._lockedAnimation = null;
-            self._lastAttack = null;
-            self.isAttacking = false;
-        }
+
+            if (unlockCallback)
+                unlockCallback();
+        };
+
+        this._animLocked = true;
+        this._lockedAnimation = animation;
+        this._lockedAnimation.animation.index = 0;
+
+        if (lockDuration === 0)
+            this._lockedAnimation.animation.on_end = onUnlock;
+        else
+            setTimeout(onUnlock, lockDuration);
     }
 
     update()
@@ -148,19 +183,22 @@ class Player extends jaws.Sprite implements IPlayerEntity
             return;
         }
 
-        this.vx = 0;
-        this.vy = 0;
-        if (jaws.pressed(Keys.LEFT)) this.vx = -2;
-        if (jaws.pressed(Keys.RIGHT)) this.vx = 2;
-        if (jaws.pressed(Keys.UP)) this.vy = -1;
-        if (jaws.pressed(Keys.DOWN)) this.vy = 1;
-        if (jaws.pressed(Keys.Z)) this.attack(this.animations.punch, 5);
-        if (jaws.pressed(Keys.X)) this.attack(this.animations.kick, 10);
-        if (jaws.pressed(Keys.C)) this.attack(this.animations.uppercut, 15);
-
-        this.isRunning = jaws.pressed(Keys.SHIFT);
-
-        if (this.vx === 0 && this.vy === 0)
+        if (!this.isInAir)
+        {
+            this.vx = 0;
+            this.vy = 0;
+            this.isRunning = jaws.pressed(Keys.SHIFT);
+            if (jaws.pressed(Keys.LEFT)) this.vx = -Constants.PLAYER_WALK_SPEED_X;
+            if (jaws.pressed(Keys.RIGHT)) this.vx = Constants.PLAYER_WALK_SPEED_X;
+            if (jaws.pressed(Keys.UP)) this.vy = -Constants.PLAYER_WALK_SPEED_Y;
+            if (jaws.pressed(Keys.DOWN)) this.vy = Constants.PLAYER_WALK_SPEED_Y;
+            if (jaws.pressed(Keys.Z)) this.attack(this.animations.punch);
+            if (jaws.pressed(Keys.X)) this.attack(this.animations.kick);
+            if (jaws.pressed(Keys.C)) this.attack(this.animations.uppercut);
+            if (jaws.pressed(Keys.S)) this.jump();
+        }
+        
+        if (this.vx === 0 && this.vy === 0 && !this.isInAir)
         {
             this.setImage(this.animations.idle.animation.next());
         }
@@ -169,20 +207,38 @@ class Player extends jaws.Sprite implements IPlayerEntity
             if (this.vx < 0) this.flipped = true;
             if (this.vx > 0) this.flipped = false;
 
-            if (this.isRunning)
+            if (this.isInAir)
             {
-                this.move(this.vx * 2, this.vy * 2);
+                if (this.y + this.vy >= this._startingY)
+                {
+                    this.y = this._startingY;
+                    this.vx = 0;
+                    this.vy = 0;
+                    this.isInAir = false;
+                    this.lock(this.animations.crouch, null, Constants.PLAYER_LANDING_DELAY);
+                }
+                else
+                {
+                    this.vy = this.vy + Constants.GRAVITY;
+                    this.setImage(this.animations.jump.animation.next());
+                }
+            }
+            else if (this.isRunning)
+            {
+                this.vx *= Constants.PLAYER_RUN_MULTIPLIER;
+                this.vy *= Constants.PLAYER_RUN_MULTIPLIER;
                 this.setImage(this.animations.run.animation.next());
             }
             else
             {
-                this.move(this.vx, this.vy);
                 this.setImage(this.animations.move.animation.next());
             }
+
         }
 
         //This needs to moved out and put into map logic
-        this.y = MathHelpers.clamp(this.y, 360, Constants.VIEWPORT_HEIGHT - this.rect().height);
+        if (!this.isInAir)
+            this.y = MathHelpers.clamp(this.y, 360, Constants.VIEWPORT_HEIGHT - this.rect().height);
     }
 
     getAttackInfo(): IAttackInfo
@@ -212,6 +268,4 @@ class Player extends jaws.Sprite implements IPlayerEntity
 
         return attackInfo;
     }
-
-    
 }

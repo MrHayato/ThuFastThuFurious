@@ -5,6 +5,7 @@ interface IEntity
 {
     vx: number;
     vy: number;
+    isInAir: bool;
 
     update();
     takeDamage(attackInfo: IAttackInfo);

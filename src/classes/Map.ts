@@ -149,6 +149,7 @@ class Map
 
         //Update player position
         this._player.update();
+        this._player.move(this._player.vx, this._player.vy);
 
         //Update background position
         this._viewport.centerAround(this._player);

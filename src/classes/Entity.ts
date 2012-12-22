@@ -12,8 +12,7 @@ interface EntityDefinition
 
 class Entity extends jaws.Sprite implements IEntity
 {
-    decelRate = 0.85;
-
+    isInAir: bool;
     damage: number;
     vx: number;
     vy: number;
@@ -46,7 +45,7 @@ class Entity extends jaws.Sprite implements IEntity
         if (!this._loaded) return;
 
         this.px += this.vx;
-        this.vx *= this.decelRate;
+        this.vx *= Constants.FRICTION;
 
         if (this.vx < 0.05 && this.vx > 0) this.vx = 0;
         if (this.vx > -0.05 && this.vx < 0) this.vx = 0;
