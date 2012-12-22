@@ -1,4 +1,4 @@
-
+﻿
 !!! 5
 html
     head
@@ -13,8 +13,13 @@ html
             body {
                 margin: 50px;
                 text-align: center;
+                background-color: #0d0d0d;
+                color: #dddddd;
             }
 
+            .table-striped tbody > tr:nth-child(odd) > td, .table-striped tbody > tr:nth-child(odd) > th {
+                background-color: #1d1d1d;
+            }
     body
         div.container
             div.row
@@ -22,6 +27,24 @@ html
                     canvas(width="900", height="500")
             div.row
                 div#instructions.span6.offset3
-                    span Move with arrow keys; Run with the Shift key; Attack with Z, X, C
+                    table.table.table-condensed.table-bordered.table-striped
+                        tr
+                            td Move
+                            td ←↑→↓
+                        tr
+                            td Run
+                            td Shift
+                        tr
+                            td Jump
+                            td S
+                        tr
+                            td Punch
+                            td Z
+                        tr
+                            td Kick
+                            td X
+                        tr
+                            td Uppercut
+                            td C
                 div.span2.offset1 FPS:
                     span#fps
